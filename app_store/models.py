@@ -1,16 +1,19 @@
 from django.db import models
-from django.db.models.fields import DecimalField
+from datetime import datetime
+from django.utils import timezone
 
 # Create your models here.
 class Vip(models.Model):
-    name = models.CharField(max_length= 32)
+    name = models.CharField(max_length= 32, unique= True)
     mail = models.CharField(max_length= 128)
     password = models.CharField(max_length= 64)    # SHA256加密后的密码
-    avatar = models.CharField(max_length= 32)       # MD5摘要算法
-    birthday = models.DateField()
-    level = models.IntegerField()
-    expire_data = models.DateTimeField()
-    create_data = models.DateTimeField()
+    avatar = models.CharField(max_length= 32, default= 'default.png')       # MD5摘要算法
+    birthday = models.DateField(default= timezone.now)
+    level = models.IntegerField(default= 0)
+    exp = models.IntegerField(default= 0)
+    money = models.DecimalField(max_digits=65, decimal_places=2, default= 0)
+    expire_date = models.DateTimeField(default= datetime.fromtimestamp(0, timezone.utc))
+    create_date = models.DateTimeField(default= timezone.now)
 
 class Seat(models.Model):
     condition = models.IntegerField()
@@ -31,7 +34,7 @@ class Book(models.Model):
     pub_data = models.DateField()
     version = models.IntegerField()
     author = models.CharField(max_length= 128)
-    price = models.DecimalField(max_digits= 65, decimal_places= 2)
+    price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     page = models.IntegerField()
     desc = models.TextField()
     catalog = models.TextField()
@@ -68,7 +71,7 @@ class Role(models.Model):
 class Staff(models.Model):
     name = models.CharField(max_length= 32)
     age = models.IntegerField()
-    salary = models.DecimalField(max_digits= 65, decimal_places= 2)
+    salary = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     card = models.CharField(max_length= 32)
     phone = models.CharField(max_length= 32)
     role = models.ForeignKey(Role, default= 0, on_delete= models.SET_DEFAULT)
@@ -80,7 +83,7 @@ class FoodType(models.Model):
 class Food(models.Model):
     type = models.ForeignKey(FoodType, on_delete=models.RESTRICT)
     name = models.CharField(max_length= 32)
-    price = models.DecimalField(max_digits=65, decimal_places=2)
+    price = models.DecimalField(max_digits=65, decimal_places=2, default= 0)
     deal_amount = models.IntegerField()
     avatar = models.CharField(max_length= 32)   # use MD5
     memo = models.TextField()
@@ -88,8 +91,8 @@ class Food(models.Model):
 class BookOrder(models.Model):
     vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL)
     data = models.DateTimeField()
-    total_price = models.DecimalField(max_digits= 65, decimal_places= 2)
-    pay_price = models.DecimalField(max_digits= 65, decimal_places= 2)
+    total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
+    pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     status = models.IntegerField()
     cust_name = models.CharField(max_length= 32)
     address = models.TextField()
@@ -100,15 +103,15 @@ class BookOrderItem(models.Model):
     order_id = models.ForeignKey(BookOrder, on_delete= models.CASCADE)
     book_id = models.ForeignKey(Book, null= True, on_delete= models.SET_NULL)
     amount = models.IntegerField()
-    total_price = models.DecimalField(max_digits= 65, decimal_places= 2)
-    pay_price = models.DecimalField(max_digits= 65, decimal_places= 2)
+    total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
+    pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
 
 class FoodOrder(models.Model):
     vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL)
     seat_id = models.ForeignKey(Seat, null= True, on_delete= models.SET_NULL)
     data = models.DateTimeField()
-    total_price = models.DecimalField(max_digits= 65, decimal_places= 2)
-    pay_price = models.DecimalField(max_digits= 65, decimal_places= 2)
+    total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
+    pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     status = models.IntegerField()
     memo = models.TextField()
 
@@ -116,13 +119,13 @@ class FoodOrderItem(models.Model):
     order_id = models.ForeignKey(FoodOrder, on_delete= models.CASCADE)
     food_id = models.ForeignKey(Food, null= True, on_delete= models.SET_NULL)
     amount = models.IntegerField()
-    total_price = models.DecimalField(max_digits= 65, decimal_places= 2)
-    pay_price = models.DecimalField(max_digits= 65, decimal_places= 2)
+    total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
+    pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
 
 class Deal(models.Model):
     type = models.IntegerField()
     order_id = models.BigIntegerField()
-    amount = models.DecimalField(max_digits= 65, decimal_places= 2)
+    amount = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     data = models.DateTimeField()
 
 class BookStore(models.Model):

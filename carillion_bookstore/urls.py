@@ -16,6 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from app_store import views
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
+    path('v1/test/connect/', views.test_connect),
+    path('v1/vip/register/', views.vip_register),
+    path('v1/vip/login/', views.vip_login),
+    path('v1/vip/avatar/', views.vip_avatar),
+    path('v1/vip/info/', views.vip_info),
+
 ]
