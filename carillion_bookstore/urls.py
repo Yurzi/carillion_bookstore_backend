@@ -25,5 +25,8 @@ urlpatterns = [
     path('v1/vip/login/', views.vip_login),
     path('v1/vip/avatar/', views.vip_avatar),
     path('v1/vip/info/', views.vip_info),
+    path('v1/vip/recharge/', views.vip_recharge),
+    path('v1/vip/update/', views.vip_info_update),
+    path('v1/vip/updateAvatar/', views.vip_avatar_update),
 
 ]

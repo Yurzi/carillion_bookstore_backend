@@ -7,7 +7,7 @@ class Vip(models.Model):
     name = models.CharField(max_length= 32, unique= True)
     mail = models.CharField(max_length= 128)
     password = models.CharField(max_length= 64)    # SHA256加密后的密码
-    avatar = models.CharField(max_length= 32, default= 'default.png')       # MD5摘要算法
+    avatar = models.CharField(max_length= 36, default= 'default.png')       # MD5摘要算法
     birthday = models.DateField(default= timezone.now)
     level = models.IntegerField(default= 0)
     exp = models.IntegerField(default= 0)
@@ -85,12 +85,12 @@ class Food(models.Model):
     name = models.CharField(max_length= 32)
     price = models.DecimalField(max_digits=65, decimal_places=2, default= 0)
     deal_amount = models.IntegerField()
-    avatar = models.CharField(max_length= 32)   # use MD5
+    avatar = models.CharField(max_length= 36)   # use MD5
     memo = models.TextField()
 
 class BookOrder(models.Model):
     vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL)
-    data = models.DateTimeField()
+    date = models.DateTimeField()
     total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     status = models.IntegerField()
@@ -109,7 +109,7 @@ class BookOrderItem(models.Model):
 class FoodOrder(models.Model):
     vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL)
     seat_id = models.ForeignKey(Seat, null= True, on_delete= models.SET_NULL)
-    data = models.DateTimeField()
+    date = models.DateTimeField()
     total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     status = models.IntegerField()
@@ -122,18 +122,28 @@ class FoodOrderItem(models.Model):
     total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
 
+class VipOrder(models.Model):
+    vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL)
+    date = models.DateTimeField()
+    total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
+    pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
+    status = models.IntegerField()
+
+class DealType(models.Model):
+    title = models.CharField(max_length= 32)
+
 class Deal(models.Model):
-    type = models.IntegerField()
+    type = models.ForeignKey(DealType, default= -1, on_delete= models.SET_DEFAULT)
     order_id = models.BigIntegerField()
     amount = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
-    data = models.DateTimeField()
+    date = models.DateTimeField()
 
 class BookStore(models.Model):
     book_id = models.ForeignKey(Book, on_delete=models.CASCADE)
     amount = models.IntegerField()
-    data = models.DateTimeField()
+    date = models.DateTimeField()
 
 class FoodStore(models.Model):
     food_id = models.ForeignKey(Food, on_delete=models.CASCADE)
     amount = models.IntegerField()
-    data = models.DateTimeField()
+    date = models.DateTimeField()
