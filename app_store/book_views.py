@@ -219,3 +219,58 @@ def get_book_category(request):
         'record': category_list
     }
     return JsonResponse(response)
+
+def get_book_list(request):
+    if request.method != 'GET':
+        return JsonResponse({'code': 400, 'message': '请求方式错误'})
+
+    try:
+        limit = request.GET.get('limit')
+        page = request.GET.get('page')
+        s_name = request.GET.get('s_name')
+        s_categoryIds = request.GET.get('s_categoryIds')
+        s_pressName = request.GET.get('s_pressName')
+        s_status =int(request.GET.get('s_status'))
+    except:
+        return JsonResponse({'code': 400, 'message': '请求参数错误'})
+
+    book_list = Book.objects.all()
+    book_total = book_list.count()
+    if len(s_name) > 0:
+        book_list = book_list.filter(name__contains=s_name)
+    if len(s_pressName) >0:
+        try:
+            press_obj = Press.objects.get(name=s_pressName)
+        except Press.DoesNotExist:
+            return JsonResponse({'code': 400, 'message': '出版社不存在'})
+        book_list = book_list.filter(press=press_obj)
+    if s_status != -1:
+        book_list = book_list.filter(is_show=bool(s_status))
+    if len(s_categoryIds) > 0:
+        category_list = BookType.objects.filter(id__in=s_categoryIds)
+        book_list = book_list.filter(category__in=category_list)
+
+    book_list = book_list[(page - 1) * limit:page * limit]
+    response = {
+        'code': 200,
+        'message': '获取成功',
+        'limit': limit,
+        'page': page,
+        'total': book_total,
+        'record':[]
+    }
+    for item in book_list:
+        temp= {
+            'id': item.id,
+            'categoryId': item.category.id,
+            'categoryName': item.category.name,
+            'name': item.name,
+            'pressId': item.press.id,
+            'pressName': item.press.name,
+            'price': item.price,
+            'dealamount': item.deal_amount,
+            'pic': '/static/img/book_avatar/' + item.pic,
+            'isShow': int(item.is_show),
+        }
+        response['record'].append(temp)
+    return JsonResponse(response)
