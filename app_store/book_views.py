@@ -1,6 +1,7 @@
 from app_store.models import *
 from django.http import JsonResponse
 from django.views import View
+import json
 
 
 class BookInfoView(View):
@@ -42,6 +43,38 @@ class BookInfoView(View):
 
     # 创建新图书
     def post(self, request):
+        post = json.loads(request.body)
+        print(post)
+        if post is None:
+            return JsonResponse({'code': 400, 'message': 'post不能为空'})
+        try:
+            type_obj = BookType.objects.get(id=post['categoryId'])
+        except BookType.DoesNotExist:
+            return JsonResponse({'code': 400, 'message': '图书类型不存在'})
+        try:
+            press_obj = Press.objects.get(id=post['pressId'])
+        except Press.DoesNotExist:
+            return JsonResponse({'code': 400, 'message': '出版社不存在'})
+
+        try:
+            book_obj = Book(
+                type=type_obj,
+                name=post['name'],
+                press=press_obj,
+                pub_data=datetime.strptime(post['pubDate'], '%Y-%m-%d').date(),
+                version=post['version'],
+                author=post['author'],
+                desc=post['desc'],
+                page=post['page'],
+                price=post['price'],
+                is_show=post['isShow']
+            )
+        except KeyError:
+            return JsonResponse({'code': 404, 'message': '数据键值对不完全'})
+        book_obj.save()
+
+
+
 
         return JsonResponse({'code': 200, 'message': 'post'})
 

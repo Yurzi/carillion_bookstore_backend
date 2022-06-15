@@ -281,7 +281,7 @@ def vip_info_update(request):
 
     user = Vip.objects.filter(id=post['id']).first()
 
-    if user == None or not user.is_exist:
+    if user is None or not user.is_exist:
         response = {
             'code': 404,
             'message': '用户不存在'
@@ -291,9 +291,12 @@ def vip_info_update(request):
     birthday = datetime.strptime(birthday, "%Y-%m-%d").date()
     password = hashlib.sha256(post['password'].__str__().encode('utf-8')).hexdigest()
 
-    if post['birthday'] != None: user.main = post['mail']
-    if post['birthday'] != None: user.birthday = birthday
-    if post['password'] != None: user.password = password
+    if post['birthday'] is not None:
+        user.main = post['mail']
+    if post['birthday'] is not None:
+        user.birthday = birthday
+    if post['password'] is not None:
+        user.password = password
 
     user.save()
 

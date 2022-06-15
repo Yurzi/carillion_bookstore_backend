@@ -48,7 +48,7 @@ class Book(models.Model):
     deal_amount = models.IntegerField()
     look_amount = models.IntegerField()
     pic = models.CharField(max_length=32, default='default.png')
-    permission = models.IntegerField()
+    permission = models.IntegerField(default=0)
     is_show = models.BooleanField(default=True)
 
 
