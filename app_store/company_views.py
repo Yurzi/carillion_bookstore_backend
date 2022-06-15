@@ -4,9 +4,10 @@ from django.http import JsonResponse
 from django.views import View
 from app_store.models import *
 
+
 class StaffView(View):
     def get(self, request):
-        print(request.GET)
+        # print(request.GET)
         limit = int(request.GET.get('limit'))
         page = int(request.GET.get('page'))
         s_name = request.GET.get('s_name')
@@ -31,7 +32,7 @@ class StaffView(View):
                 return JsonResponse({'code': 400, 'message': '部门不存在'})
             staff_list = staff_list.filter(depart=depart_obj)
 
-        staff_list = staff_list[(page-1)*limit:page*limit]
+        staff_list = staff_list[(page - 1) * limit:page * limit]
         staff_list = list(staff_list.values())
         response = {
             'code': 200,
@@ -46,14 +47,13 @@ class StaffView(View):
 
     def post(self, request):
         staff_post = json.loads(request.body)
-        print(staff_post)
+        # print(staff_post)
         try:
             role_obj = Role.objects.get(id=staff_post['role'])
         except Role.DoesNotExist:
             return JsonResponse({'code': 400, 'message': '角色不存在'})
 
-
-        staff_obj = Staff(name= staff_post['name'],
+        staff_obj = Staff(name=staff_post['name'],
                           age=staff_post['age'],
                           salary=staff_post['salary'],
                           card=staff_post['card'],
@@ -66,7 +66,7 @@ class StaffView(View):
 
     def delete(self, request):
         id = request.GET.get('id')
-        if id == None:
+        if id is None:
             return JsonResponse({'code': 400, 'message': 'id不能为空'})
         try:
             staff = Staff.objects.get(id=id)
@@ -98,6 +98,7 @@ class StaffView(View):
         staff_obj.save()
         return JsonResponse({'code': 200, 'message': '修改成功'})
 
+
 class DepartView(View):
     def get(self, request):
         departs_list = Depart.objects.all()
@@ -117,6 +118,7 @@ class DepartView(View):
         }
         return JsonResponse(response)
 
+
 class RoleView(View):
     def get(self, request):
         roles_list = Role.objects.all()
@@ -126,7 +128,8 @@ class RoleView(View):
             record.append({
                 'id': role.id,
                 'parent': role.parent,
-                'name': role.name
+                'name': role.name,
+                'depart': role.depart.id
             })
 
         response = {

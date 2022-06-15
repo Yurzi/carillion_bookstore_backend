@@ -47,7 +47,7 @@ class Book(models.Model):
     catalog = models.TextField()
     deal_amount = models.IntegerField()
     look_amount = models.IntegerField()
-    pic = models.CharField(max_length=32)
+    pic = models.CharField(max_length=32, default='default.png')
     permission = models.IntegerField()
     is_show = models.BooleanField(default=True)
 
@@ -93,6 +93,7 @@ class Staff(models.Model):
     depart = models.ForeignKey(Depart, on_delete=models.RESTRICT, related_name='staff')
     date = models.DateTimeField(default=timezone.now)
 
+
 class FoodType(models.Model):
     title = models.CharField(max_length=32, unique=True)
 
@@ -102,7 +103,7 @@ class Food(models.Model):
     name = models.CharField(max_length=32)
     price = models.DecimalField(max_digits=65, decimal_places=2, default=0)
     deal_amount = models.IntegerField()
-    avatar = models.CharField(max_length=36)  # use MD5
+    avatar = models.CharField(max_length=36, default='default.png')  # use MD5
     memo = models.TextField()
 
 

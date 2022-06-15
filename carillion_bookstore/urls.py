@@ -19,6 +19,7 @@ from django.urls import path
 from app_store import views
 from app_store import book_views
 from app_store import company_views
+from app_store import food_views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -37,4 +38,10 @@ urlpatterns = [
     path('v1/company/staff/', company_views.StaffView.as_view()),
     path('v1/company/department/', company_views.DepartView.as_view()),
     path('v1/company/role/', company_views.RoleView.as_view()),
+    path('v1/book/info/', book_views.BookInfoView.as_view()),
+    path('v1/press/list/', book_views.PublishInfoView.as_view()),
+    path('v1/book/category/', book_views.get_book_category),
+    # food
+    path('v1/food/list/', food_views.get_food_list),
+    path('v1/food/buy/', food_views.food_buy),
 ]
