@@ -20,6 +20,7 @@ from app_store import views
 from app_store import book_views
 from app_store import company_views
 from app_store import food_views
+from app_store import share_views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -44,4 +45,6 @@ urlpatterns = [
     # food
     path('v1/food/list/', food_views.get_food_list),
     path('v1/food/buy/', food_views.food_buy),
+    path('v1/share/clicks/', share_views.get_share_clicks),
+    path('v1/share/seatchange/', share_views.get_share_seatchange),
 ]
