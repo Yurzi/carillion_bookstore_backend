@@ -47,7 +47,7 @@ class Book(models.Model):
     catalog = models.TextField()
     deal_amount = models.IntegerField(default=0)
     look_amount = models.IntegerField(default=0)
-    pic = models.CharField(max_length=32, default='default.png')
+    pic = models.CharField(max_length=36, default='default.png')
     permission = models.IntegerField(default=0)
     is_show = models.BooleanField(default=True)
 
