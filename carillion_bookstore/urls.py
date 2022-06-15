@@ -39,7 +39,7 @@ urlpatterns = [
     path('v1/company/department/', company_views.DepartView.as_view()),
     path('v1/company/role/', company_views.RoleView.as_view()),
     path('v1/book/info/', book_views.BookInfoView.as_view()),
-    path('v1/press/list/', book_views.PublishInfoView.as_view()),
+    path('v1/press/info/', book_views.PublishInfoView.as_view()),
     path('v1/book/category/', book_views.get_book_category),
     # food
     path('v1/food/list/', food_views.get_food_list),

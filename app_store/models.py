@@ -22,7 +22,7 @@ class Vip(models.Model):
 class Seat(models.Model):
     condition = models.IntegerField()
     vip_id = models.ForeignKey(Vip, on_delete=models.RESTRICT, related_name='seat')
-    data = models.DateTimeField()
+    date = models.DateTimeField()
 
 
 class Press(models.Model):
@@ -45,8 +45,8 @@ class Book(models.Model):
     page = models.IntegerField()
     desc = models.TextField()
     catalog = models.TextField()
-    deal_amount = models.IntegerField()
-    look_amount = models.IntegerField()
+    deal_amount = models.IntegerField(default=0)
+    look_amount = models.IntegerField(default=0)
     pic = models.CharField(max_length=32, default='default.png')
     permission = models.IntegerField(default=0)
     is_show = models.BooleanField(default=True)

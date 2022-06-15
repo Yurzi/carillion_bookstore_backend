@@ -73,14 +73,44 @@ class BookInfoView(View):
             return JsonResponse({'code': 404, 'message': '数据键值对不完全'})
         book_obj.save()
 
-
-
-
-        return JsonResponse({'code': 200, 'message': 'post'})
+        return JsonResponse({'code': 200, 'message': '新建成功'})
 
     # 按id修改图书
     def put(self, request):
-        return JsonResponse({'code': 200, 'message': 'put'})
+        put = json.loads(request.body)
+        if put is None:
+            return JsonResponse({'code': 400, 'message': 'put不能为空'})
+        try:
+            book_obj = Book.objects.get(id=put['id'])
+        except Book.DoesNotExist:
+            return JsonResponse({'code': 400, 'message': '图书不存在'})
+        try:
+            type_obj = BookType.objects.get(id=put['categoryId'])
+        except BookType.DoesNotExist:
+            return JsonResponse({'code': 400, 'message': '图书类型不存在'})
+        try:
+            press_obj = Press.objects.get(id=put['pressId'])
+        except Press.DoesNotExist:
+            return JsonResponse({'code': 400, 'message': '出版社不存在'})
+
+        try:
+            book_obj.type = type_obj
+            book_obj.name = put['name']
+            book_obj.press = press_obj
+            book_obj.pub_data = datetime.strptime(put['pubDate'], '%Y-%m-%d').date()
+            book_obj.version = put['version']
+            book_obj.author = put['author']
+            book_obj.desc = put['desc']
+            book_obj.page = put['page']
+            book_obj.price = put['price']
+            book_obj.is_show = put['isShow']
+            book_obj.deal_amount = put['dealamount']
+            book_obj.look_amount = put['lookamount']
+        except KeyError:
+            return JsonResponse({'code': 404, 'message': '数据键值对不完全'})
+        book_obj.save()
+
+        return JsonResponse({'code': 200, 'message': '修改成功'})
 
     # 按id删除图书
     def delete(self, request):
@@ -122,10 +152,59 @@ class PublishInfoView(View):
         return JsonResponse(response)
 
     def post(self, request):
-        return JsonResponse({'code': 200, 'message': 'post'})
+        post = json.loads(request.body)
+        print(post)
+        if post is None:
+            return JsonResponse({'code': 400, 'message': 'post不能为空'})
+        try:
+            pub_obj = Press(
+                name=post['name']
+            )
+        except KeyError:
+            return JsonResponse({'code': 404, 'message': '数据键值对不完全'})
+        pub_obj.save()
+        return JsonResponse({'code': 200, 'message': '新建成功'})
+
+    def put(self, request):
+        put = json.loads(request.body)
+        print(put)
+        if put is None:
+            return JsonResponse({'code': 400, 'message': 'post不能为空'})
+        try:
+            pub_obj = Press.objects.get(id=put['id'])
+        except Press.DoesNotExist:
+            return JsonResponse({'code': 400, 'message': '出版社不存在'})
+        try:
+            pub_obj.name = put['name']
+        except KeyError:
+            return JsonResponse({'code': 404, 'message': '数据键值对不完全'})
+        pub_obj.save()
+        return JsonResponse({'code': 200, 'message': '修改成功'})
 
     def delete(self, request):
         return JsonResponse({'code': 200, 'message': 'delete'})
+
+
+class  BookAvatarView(View):
+    def get(self, request):
+        id = request.GET.get('id')
+        if id is None:
+            return JsonResponse({'code': 400, 'message': 'id不能为空'})
+
+        try:
+            book_obj = Book.objects.get(id=id)
+        except Book.DoesNotExist:
+            return JsonResponse({'code': 400, 'message': '图书不存在'})
+        book_info = {
+            'code': 200,
+            'message': '获取成功',
+            'url': '/static/img/book_avatar/' + book_obj.pic
+        }
+        return JsonResponse(book_info)
+
+    def post(self, request):
+        return JsonResponse({'code': 200, 'message': 'post'})
+
 
 def get_book_category(request):
     if request.method != 'GET':
