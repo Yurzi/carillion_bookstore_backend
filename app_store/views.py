@@ -47,7 +47,7 @@ def vip_register(request):
             'id': -1
             }
     try:
-        user.save();
+        user.save()
     except IntegrityError:
         response['code'] = 400
         response['message'] = "用户名已存在"
@@ -75,7 +75,7 @@ def vip_login(request):
                 'message': '用户不存在'
                 }
         return JsonResponse(response)
-    
+
     if user.password != password:
         response = {
                 'code': 403,
@@ -250,7 +250,7 @@ def vip_recharge(request):
         vip_order.save()
         deal_type = DealType.objects.filter(title= 'vip').first()
         deal = Deal.objects.create(type= deal_type, order_id= vip_order.id, amount= post['money'], date= timezone.now())
-        deal.save() 
+        deal.save()
         response = {
                 'code': 200,
                 'message': "充值成功",
@@ -321,7 +321,7 @@ def vip_avatar_update(request):
     response = {}
     if img:
         file_type = img.name.split('.')[-1]
-        prefix = os.path.join(os.getcwd(), 'app_store/', 'static/', 'img/', 'vip_avatar/') 
+        prefix = os.path.join(os.getcwd(), 'app_store/', 'static/', 'img/', 'vip_avatar/')
         path = prefix + 'temp.' + file_type
         if img.multiple_chunks():
             file_yield = img.chunks()
@@ -361,7 +361,7 @@ def vip_avatar_update(request):
                 'code': 400,
                 'message': '文件上传为空'
                 }
-   
+
     return JsonResponse(response)
 
 def vip_charge_list(request):
@@ -387,7 +387,7 @@ def vip_charge_list(request):
         return JsonResponse(response)
     deal_type = DealType.objects.get(title= 'vip')
     deal_list = user.deal.filter(type= deal_type)
-    
+
     response = {
             'code': 200,
             'message': '获取成功',
@@ -405,7 +405,3 @@ def vip_charge_list(request):
         response['orderlist'].append(temp)
 
     return JsonResponse(response)
-    
-
-
-

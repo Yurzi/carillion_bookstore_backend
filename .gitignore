@@ -1,3 +1,6 @@
 **/__pycache__/
 **/migrations/
 **/static/img/
+.idea/
+
+*.txt

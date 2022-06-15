@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path
 
 from app_store import views
+from app_store import book_views
+from app_store import company_views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -32,5 +34,7 @@ urlpatterns = [
     path('v1/vip/chargelist/', views.vip_charge_list),
 
     # book
-
+    path('v1/company/staff/', company_views.StaffView.as_view()),
+    path('v1/company/department/', company_views.DepartView.as_view()),
+    path('v1/company/role/', company_views.RoleView.as_view()),
 ]
