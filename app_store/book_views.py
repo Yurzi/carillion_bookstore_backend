@@ -1,7 +1,11 @@
+import os.path
+
 from app_store.models import *
 from django.http import JsonResponse
 from django.views import View
+from PIL import Image
 import json
+import hashlib
 
 
 class BookInfoView(View):
@@ -128,7 +132,7 @@ class BookInfoView(View):
 
 
 class PublishInfoView(View):
-    def get(self,request):
+    def get(self, request):
         limit = request.GET.get('limit')
         page = request.GET.get('page')
         s_name = request.GET.get('s_name')
@@ -185,7 +189,7 @@ class PublishInfoView(View):
         return JsonResponse({'code': 200, 'message': 'delete'})
 
 
-class  BookAvatarView(View):
+class BookAvatarView(View):
     def get(self, request):
         id = request.GET.get('id')
         if id is None:
@@ -203,7 +207,60 @@ class  BookAvatarView(View):
         return JsonResponse(book_info)
 
     def post(self, request):
-        return JsonResponse({'code': 200, 'message': 'post'})
+        id = request.GET.get('id')
+        if id is None:
+            return JsonResponse({'code': 400, 'message': 'id不能为空'})
+        try:
+            book = Book.objects.get(id=id)
+        except Book.DoesNotExist:
+            return JsonResponse({'code': 400, 'message': '图书不存在'})
+        img = request.FILES.get('img')
+        file_type = ""
+        response = {}
+        if img:
+            file_type = img.name.split('.')[-1]
+            prefix = os.path.join(os.getcwd(), 'app_store/', 'static/', 'img/', 'book_avatar/')
+            path = prefix + 'temp.' + file_type
+            if img.multiple_chunks():
+                file_yield = img.chunks()
+                with open(path, 'wb') as f:
+                    for chunk in file_yield:
+                        f.write(chunk)
+                    else:
+                        print('大文件接受完毕')
+            else:
+                with open(path, 'wb') as f:
+                    f.write(img.read())
+                print('小文件接受完毕')
+
+            response = {
+                'code': 200,
+                'message': '上传成功',
+            }
+            # 修改图片尺寸
+            img_ori = Image.open(path)
+            img_resize = img_ori.resize((2549, 3583), Image.ANTIALIAS)
+            out_path = prefix + 'temp_resize.' + file_type
+            img_resize.save(out_path)
+            # 删除temp 文件
+            os.remove(path)
+            # 计算MD5
+            fp = open(out_path, 'rb')
+            md5 = hashlib.md5(fp.read()).hexdigest()
+            fp.close()
+            md5 = md5 + '.' + file_type
+            try:
+                os.rename(out_path, prefix + md5)
+            except FileExistsError:
+                os.remove(out_path)
+            book.pic = md5
+            book.save()
+        else:
+            response = {
+                'code': 400,
+                'message': '上传文件为空',
+            }
+        return JsonResponse(response)
 
 
 def get_book_category(request):
@@ -220,6 +277,7 @@ def get_book_category(request):
     }
     return JsonResponse(response)
 
+
 def get_book_list(request):
     if request.method != 'GET':
         return JsonResponse({'code': 400, 'message': '请求方式错误'})
@@ -230,7 +288,7 @@ def get_book_list(request):
         s_name = request.GET.get('s_name')
         s_categoryIds = request.GET.get('s_categoryIds')
         s_pressName = request.GET.get('s_pressName')
-        s_status =int(request.GET.get('s_status'))
+        s_status = int(request.GET.get('s_status'))
     except:
         return JsonResponse({'code': 400, 'message': '请求参数错误'})
 
@@ -238,7 +296,7 @@ def get_book_list(request):
     book_total = book_list.count()
     if len(s_name) > 0:
         book_list = book_list.filter(name__contains=s_name)
-    if len(s_pressName) >0:
+    if len(s_pressName) > 0:
         try:
             press_obj = Press.objects.get(name=s_pressName)
         except Press.DoesNotExist:
@@ -257,10 +315,10 @@ def get_book_list(request):
         'limit': limit,
         'page': page,
         'total': book_total,
-        'record':[]
+        'record': []
     }
     for item in book_list:
-        temp= {
+        temp = {
             'id': item.id,
             'categoryId': item.category.id,
             'categoryName': item.category.name,
@@ -274,3 +332,26 @@ def get_book_list(request):
         }
         response['record'].append(temp)
     return JsonResponse(response)
+
+
+def get_book_reviews(request):
+    if request.method != 'GET':
+        return JsonResponse({'code': 400, 'message': '请求方式错误'})
+    book_list = Book.objects.all()
+    book_total = book_list.count()
+    book_offsale = book_list.filter(is_show=False).count()
+    book_onsale = book_total - book_offsale
+
+    response = {
+        'code': 200,
+        'message': '获取成功',
+        'result':{
+            'total': book_total,
+            'onSale': book_onsale,
+            'offSale': book_offsale
+        }
+    }
+
+    return JsonResponse(response)
+
+

@@ -34,8 +34,9 @@ urlpatterns = [
     path('v1/vip/update/', views.vip_info_update),
     path('v1/vip/updateAvatar/', views.vip_avatar_update),
     path('v1/vip/chargelist/', views.vip_charge_list),
+    path('v1/vip/review/', views.vip_review),
 
-    # book
+    # book:w
     path('v1/company/staff/', company_views.StaffView.as_view()),
     path('v1/company/department/', company_views.DepartView.as_view()),
     path('v1/company/role/', company_views.RoleView.as_view()),

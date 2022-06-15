@@ -416,3 +416,43 @@ def vip_charge_list(request):
         response['orderlist'].append(temp)
 
     return JsonResponse(response)
+
+
+def vip_review(request):
+    if request.method != 'GET':
+        response = {
+            'code': 400,
+            'message': '方法错误'
+        }
+        return JsonResponse(response)
+
+    user_list = Vip.objects.filter(is_exist=True)
+    user_total = user_list.count()
+
+    today = datetime.today().date()
+    oneday = timedelta(days=1)
+    yesterday = today - oneday
+
+    user_yesterday = user_list.filter(create_date__date=yesterday).count()
+    user_today = user_list.filter(create_date__date=today).count()
+
+    this_month = today.month
+    this_month_add = user_list.filter(create_date__month=this_month).count()
+
+    response = {
+        'code': 200,
+        'message': '获取成功',
+        'result': {
+            'total': user_total,
+            'yesterday': user_yesterday,
+            'today': user_today,
+            'month': this_month
+        }
+    }
+
+    return JsonResponse(response)
+
+
+
+def get_zero_day(daytime:datetime):
+    return daytime.replace(hour=0, minute=0, second=0, microsecond=0)
