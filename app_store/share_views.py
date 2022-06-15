@@ -45,6 +45,8 @@ def get_share_seatchange(request):
         seat_obj = Seat.objects.get(id=seat_id)
     except Seat.DoesNotExist:
         return JsonResponse({'code': 400, 'message': '座位不存在'})
+    if seat_obj.condition:
+        return JsonResponse({'code': 401, 'message': '座位已被占用'})
     seat_obj.update(vip_id=cos_id)
     seat_obj.update(date=now_date)
     seat_obj.update(condition=1)
