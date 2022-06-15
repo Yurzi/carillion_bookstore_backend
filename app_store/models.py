@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime
+from django.db.models.fields.related import ForeignKey
 from django.utils import timezone
 
 # Create your models here.
@@ -14,10 +15,11 @@ class Vip(models.Model):
     money = models.DecimalField(max_digits=65, decimal_places=2, default= 0)
     expire_date = models.DateTimeField(default= datetime.fromtimestamp(0, timezone.utc))
     create_date = models.DateTimeField(default= timezone.now)
+    is_exist = models.BooleanField(default= True)
 
 class Seat(models.Model):
     condition = models.IntegerField()
-    vip_id = models.ForeignKey(Vip, on_delete= models.RESTRICT)
+    vip_id = models.ForeignKey(Vip, on_delete= models.RESTRICT, related_name='seat')
     data = models.DateTimeField()
 
 class Press(models.Model):
@@ -25,12 +27,12 @@ class Press(models.Model):
     is_show = models.BooleanField()
 
 class BookType(models.Model):
-    title = models.CharField(max_length= 32)
+    title = models.CharField(max_length= 33, unique= True)
 
 class Book(models.Model):
-    type = models.ForeignKey(BookType, on_delete=models.RESTRICT)
+    type = models.ForeignKey(BookType, on_delete=models.RESTRICT, related_name= 'book')
     name = models.CharField(max_length= 128)
-    press = models.ForeignKey(Press, on_delete=models.RESTRICT)
+    press = models.ForeignKey(Press, on_delete=models.RESTRICT, related_name= 'book')
     pub_data = models.DateField()
     version = models.IntegerField()
     author = models.CharField(max_length= 128)
@@ -45,21 +47,21 @@ class Book(models.Model):
     is_show = models.BooleanField()
 
 class ShareBook(models.Model):
-    vip_id = models.ForeignKey(Vip, on_delete= models.RESTRICT)
-    book_id = models.ForeignKey(Book, on_delete= models.RESTRICT)
+    vip_id = models.ForeignKey(Vip, on_delete= models.RESTRICT, related_name= 'share_book')
+    book_id = models.ForeignKey(Book, on_delete= models.RESTRICT, related_name= 'share_data')
     data = models.DateTimeField()
 
 class Post(models.Model):
     title = models.CharField(max_length= 128)
     content = models.TextField()
-    vip_id = models.ForeignKey(Vip, on_delete=models.CASCADE)
+    vip_id = models.ForeignKey(Vip, on_delete=models.CASCADE, related_name= 'post')
     data = models.DateTimeField()
 
 class PostCommnet(models.Model):
     content = models.TextField()
-    vip_id = models.ForeignKey(Vip, on_delete= models.CASCADE)
+    vip_id = models.ForeignKey(Vip, on_delete= models.CASCADE, related_name= 'post_comment')
     data = models.DateTimeField()
-    post_id = models.ForeignKey(Post, on_delete= models.CASCADE)
+    post_id = models.ForeignKey(Post, on_delete= models.CASCADE, related_name= 'post_comment')
     like_amount = models.IntegerField()
 
 class Depart(models.Model):
@@ -67,6 +69,7 @@ class Depart(models.Model):
 
 class Role(models.Model):
     name = models.CharField(max_length= 32)
+    parent = models.IntegerField()
 
 class Staff(models.Model):
     name = models.CharField(max_length= 32)
@@ -74,14 +77,14 @@ class Staff(models.Model):
     salary = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     card = models.CharField(max_length= 32)
     phone = models.CharField(max_length= 32)
-    role = models.ForeignKey(Role, default= 0, on_delete= models.SET_DEFAULT)
-    depart = models.ForeignKey(Depart, on_delete= models.RESTRICT)
+    role = models.ForeignKey(Role, default= 0, on_delete= models.SET_DEFAULT, related_name='staff')
+    depart = models.ForeignKey(Depart, on_delete= models.RESTRICT, related_name= 'staff')
 
 class FoodType(models.Model):
-    title = models.CharField(max_length= 32)
+    title = models.CharField(max_length= 32, unique= True)
 
 class Food(models.Model):
-    type = models.ForeignKey(FoodType, on_delete=models.RESTRICT)
+    type = models.ForeignKey(FoodType, on_delete=models.RESTRICT, related_name= 'food')
     name = models.CharField(max_length= 32)
     price = models.DecimalField(max_digits=65, decimal_places=2, default= 0)
     deal_amount = models.IntegerField()
@@ -89,7 +92,7 @@ class Food(models.Model):
     memo = models.TextField()
 
 class BookOrder(models.Model):
-    vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL)
+    vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL, related_name= 'book_order')
     date = models.DateTimeField()
     total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
@@ -100,15 +103,15 @@ class BookOrder(models.Model):
     memo = models.TextField()
 
 class BookOrderItem(models.Model):
-    order_id = models.ForeignKey(BookOrder, on_delete= models.CASCADE)
-    book_id = models.ForeignKey(Book, null= True, on_delete= models.SET_NULL)
+    order_id = models.ForeignKey(BookOrder, on_delete= models.CASCADE, related_name= 'order_item')
+    book_id = models.ForeignKey(Book, null= True, on_delete= models.SET_NULL, related_name='buy_record')
     amount = models.IntegerField()
     total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
 
 class FoodOrder(models.Model):
-    vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL)
-    seat_id = models.ForeignKey(Seat, null= True, on_delete= models.SET_NULL)
+    vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL, related_name= 'food_order')
+    seat_id = models.ForeignKey(Seat, null= True, on_delete= models.SET_NULL, related_name= 'food_order')
     date = models.DateTimeField()
     total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
@@ -116,34 +119,35 @@ class FoodOrder(models.Model):
     memo = models.TextField()
 
 class FoodOrderItem(models.Model):
-    order_id = models.ForeignKey(FoodOrder, on_delete= models.CASCADE)
-    food_id = models.ForeignKey(Food, null= True, on_delete= models.SET_NULL)
+    order_id = models.ForeignKey(FoodOrder, on_delete= models.CASCADE, related_name= 'order_item')
+    food_id = models.ForeignKey(Food, null= True, on_delete= models.SET_NULL, related_name= 'buy_record')
     amount = models.IntegerField()
     total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
 
 class VipOrder(models.Model):
-    vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL)
+    vip_id = models.ForeignKey(Vip, null= True, on_delete= models.SET_NULL, related_name= 'vip_order')
     date = models.DateTimeField()
     total_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     pay_price = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     status = models.IntegerField()
 
 class DealType(models.Model):
-    title = models.CharField(max_length= 32)
+    title = models.CharField(max_length= 32, unique= True)
 
 class Deal(models.Model):
-    type = models.ForeignKey(DealType, default= -1, on_delete= models.SET_DEFAULT)
+    vip_id = models.ForeignKey(Vip, default= 1, on_delete=models.SET_DEFAULT, related_name= 'deal')
+    type = models.ForeignKey(DealType, default= -1, on_delete= models.SET_DEFAULT, related_name= 'deal_item')
     order_id = models.BigIntegerField()
     amount = models.DecimalField(max_digits= 65, decimal_places= 2, default= 0)
     date = models.DateTimeField()
 
 class BookStore(models.Model):
-    book_id = models.ForeignKey(Book, on_delete=models.CASCADE)
+    book_id = models.ForeignKey(Book, on_delete=models.CASCADE, related_name= 'book_store')
     amount = models.IntegerField()
     date = models.DateTimeField()
 
 class FoodStore(models.Model):
-    food_id = models.ForeignKey(Food, on_delete=models.CASCADE)
+    food_id = models.ForeignKey(Food, on_delete=models.CASCADE, related_name= 'food_store')
     amount = models.IntegerField()
     date = models.DateTimeField()

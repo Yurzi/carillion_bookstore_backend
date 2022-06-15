@@ -21,6 +21,7 @@ from app_store import views
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('v1/test/connect/', views.test_connect),
+    # vip
     path('v1/vip/register/', views.vip_register),
     path('v1/vip/login/', views.vip_login),
     path('v1/vip/avatar/', views.vip_avatar),
@@ -28,5 +29,8 @@ urlpatterns = [
     path('v1/vip/recharge/', views.vip_recharge),
     path('v1/vip/update/', views.vip_info_update),
     path('v1/vip/updateAvatar/', views.vip_avatar_update),
+    path('v1/vip/chargelist/', views.vip_charge_list),
+
+    # book
 
 ]

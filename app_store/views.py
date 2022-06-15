@@ -1,13 +1,14 @@
-from posixpath import splitext
-from django.shortcuts import HttpResponse, render
-from django.http import JsonResponse, QueryDict
+# from django.shortcuts import HttpResponse, render
+from django.http import JsonResponse
 from django.db import IntegrityError
 from django.utils import timezone
+from datetime import datetime, timedelta
+from PIL import Image
 import json
 import hashlib
 import logging
-from datetime import datetime, timedelta
 import os
+
 
 from app_store.models import *
 
@@ -68,7 +69,7 @@ def vip_login(request):
 
     # 查找用户
     user = Vip.objects.filter(name= username).first()
-    if user == None:
+    if user == None or not user.is_exist:
         response = {
                 'code': 404,
                 'message': '用户不存在'
@@ -110,7 +111,7 @@ def vip_avatar(request):
     user_id = request.GET.get('id')
 
     user = Vip.objects.filter(id= user_id).first()
-    if user == None:
+    if user == None or not user.is_exist:
         response = {
                 'code': 404,
                 'message': '用户不存在'
@@ -124,6 +125,28 @@ def vip_avatar(request):
     return JsonResponse(response)
 
 def vip_info(request):
+    # DELETE 方法
+    if request.method == 'DELETE':
+        id = request.GET.get('id')
+        response = {
+                'code': 200,
+                'message': '删除成功'
+                }
+        if id == None:
+            response['code']= 400
+            response['message']= 'id为空'
+            return JsonResponse(response)
+        user = Vip.objects.filter(id= id).first()
+        if user == None or not user.is_exist:
+            response['code']= 404
+            response['message']= '用户不存在'
+            return JsonResponse(response)
+
+        user.is_exist = False
+        user.save()
+
+        return JsonResponse(response)
+    # GET 方法
     if request.method != 'GET':
         response = {
                 'code': 400,
@@ -135,7 +158,7 @@ def vip_info(request):
     page = int(request.GET.get('page'))
     s_name = request.GET.get('s_name')
     s_level = int(request.GET.get('s_level'))
-    user_list = Vip.objects.all()
+    user_list = Vip.objects.filter(is_exist= True)
     user_total = len(user_list)
     print(s_level)
     if s_level == -1:
@@ -194,6 +217,12 @@ def vip_recharge(request):
             '168': 356
             }
     user = Vip.objects.filter(id= post['id']).first()
+    if user == None or not user.is_exist:
+        response = {
+                'code': 404,
+                'message': '用户不存在'
+                }
+        return JsonResponse(response)
     user.exp += post['money']
     response = {}
     try:
@@ -249,7 +278,7 @@ def vip_info_update(request):
 
     user = Vip.objects.filter(id= post['id']).first()
 
-    if user == None:
+    if user == None or not user.is_exist:
         response = {
                 'code': 404,
                 'message': '用户不存在'
@@ -281,7 +310,7 @@ def vip_avatar_update(request):
     print(request.META['CONTENT_TYPE'])
     id = request.POST.get('id')
     user = Vip.objects.filter(id= id).first()
-    if user == None:
+    if user == None or not user.is_exist:
         response = {
                 'code': 404,
                 'message': '用户不存在'
@@ -309,14 +338,22 @@ def vip_avatar_update(request):
                 'code': 200,
                 'message': '文件上传成功'
                 }
-        fp = open(path, 'rb')
+        # 修改图片尺寸
+        img_ori = Image.open(path)
+        img_deal = img_ori.resize((512, 512), Image.ANTIALIAS)
+        out_path = prefix + 'temp_resize.' + file_type
+        img_deal.save(out_path)
+        # 删除temp 文件
+        os.remove(path)
+        # 计算文件md5
+        fp = open(out_path, 'rb')
         md5 = hashlib.md5(fp.read()).hexdigest()
         fp.close()
         md5 = md5 + '.' + file_type
         try:
-            os.rename(path, prefix + md5)
+            os.rename(out_path, prefix + md5)
         except FileExistsError:
-            os.remove(path)
+            os.remove(out_path)
         user.avatar = md5
         user.save()
     else:
@@ -326,3 +363,49 @@ def vip_avatar_update(request):
                 }
    
     return JsonResponse(response)
+
+def vip_charge_list(request):
+    if request.method != 'GET':
+        response = {
+                'code': 400,
+                'message': '方法错误'
+                }
+        return JsonResponse(response)
+    id = request.GET.get('id')
+    if id == None:
+        response = {
+                'code': 400,
+                'message': 'id为空'
+                }
+        return JsonResponse(response)
+    user = Vip.objects.get(id= id)
+    if user == None or not user.is_exist :
+        response = {
+                'code': 404,
+                'message': '用户不存在'
+                }
+        return JsonResponse(response)
+    deal_type = DealType.objects.get(title= 'vip')
+    deal_list = user.deal.filter(type= deal_type)
+    
+    response = {
+            'code': 200,
+            'message': '获取成功',
+            'total': len(deal_list),
+            'orderlist': []
+            }
+    # 序列化
+    for item in deal_list:
+        temp = {}
+        temp['typeid'] = item.type.id
+        temp['type'] = item.type.title
+        temp['orderid'] = item.order_id
+        temp['amount'] = item.amount
+        temp['date'] = item.date.timestamp()
+        response['orderlist'].append(temp)
+
+    return JsonResponse(response)
+    
+
+
+
