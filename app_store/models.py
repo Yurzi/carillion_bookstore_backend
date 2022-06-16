@@ -103,7 +103,7 @@ class Food(models.Model):
     type = models.ForeignKey(FoodType, on_delete=models.RESTRICT, related_name='food')
     name = models.CharField(max_length=32)
     price = models.DecimalField(max_digits=65, decimal_places=2, default=0)
-    deal_amount = models.IntegerField()
+    deal_amount = models.IntegerField(default=0)
     avatar = models.CharField(max_length=36, default='default.png')  # use MD5
     memo = models.TextField()
 

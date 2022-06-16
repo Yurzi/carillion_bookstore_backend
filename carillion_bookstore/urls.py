@@ -48,9 +48,6 @@ urlpatterns = [
     path('v1/press/show/', book_views.put_press_show),
     path('v1/book/review/', book_views.get_book_reviews),
     path('v1/book/show/', book_views.put_book_show),
-    # food
-    path('v1/food/list/', food_views.get_food_list),
-    path('v1/food/buy/', food_views.food_buy),
 
     # share
     path('v1/share/clicks/', share_views.get_share_clicks),
@@ -61,5 +58,10 @@ urlpatterns = [
     path('v1/share/seatlist/', share_views.get_seat_list),
     path('v1/share/books/', share_views.get_type_four_book),
     path('v1/share/search/', share_views.get_book_search),
+
+    # food
+    path('v1/food/info/', food_views.FoodInfoView.as_view()),
+    path('v1/food/avatar/', food_views.FoodAvatarView.as_view()),
+    path('v1/food/type/', food_views.FoodTypeView.as_view()),
 
 ]

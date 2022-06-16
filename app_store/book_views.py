@@ -77,7 +77,7 @@ class BookInfoView(View):
             return JsonResponse({'code': 404, 'message': '数据键值对不完全'})
         book_obj.save()
 
-        return JsonResponse({'code': 200, 'message': '新建成功'})
+        return JsonResponse({'code': 200, 'message': '新建成功', 'id': book_obj.id})
 
     # 按id修改图书
     def put(self, request):
