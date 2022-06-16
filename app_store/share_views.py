@@ -218,6 +218,13 @@ def post_share_book(request):
         return JsonResponse({'code': 404, 'message': '数据键值对不完全'})
     book_obj.save()
 
+    book_store_obj = BookStore(
+        book_id=book_obj,
+        amount=1,
+        date=timezone.now()
+    )
+    book_store_obj.save()
+
     share_book_obj = ShareBook(vip_id= user_obj, book_id=book_obj, date=timezone.now())
     share_book_obj.save()
 

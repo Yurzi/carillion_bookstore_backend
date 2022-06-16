@@ -102,6 +102,12 @@ class FoodInfoView(View):
         )
 
         food.save()
+        food_store_obj = FoodStore(
+            food_id = food,
+            amount=1,
+            date = timezone.now()
+        )
+        food_store_obj.save()
 
         response = {
             'code': 200,

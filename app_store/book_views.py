@@ -77,6 +77,14 @@ class BookInfoView(View):
             return JsonResponse({'code': 404, 'message': '数据键值对不完全'})
         book_obj.save()
 
+        # 创建库存表项目
+        book_store_obj = BookStore(
+            book_id = book_obj,
+            amount = 1,
+            date=timezone.now()
+        )
+        book_store_obj.save()
+
         return JsonResponse({'code': 200, 'message': '新建成功', 'id': book_obj.id})
 
     # 按id修改图书
