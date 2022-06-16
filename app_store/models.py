@@ -21,7 +21,7 @@ class Vip(models.Model):
 
 class Seat(models.Model):
     condition = models.IntegerField()
-    vip_id = models.ForeignKey(Vip, on_delete=models.RESTRICT, related_name='seat')
+    vip_id = models.ForeignKey(Vip, default=None, null=True, on_delete=models.SET_NULL, related_name='seat')
     date = models.DateTimeField()
 
 
@@ -37,7 +37,7 @@ class BookType(models.Model):
 class Book(models.Model):
     type = models.ForeignKey(BookType, on_delete=models.RESTRICT, related_name='book')
     name = models.CharField(max_length=128)
-    press = models.ForeignKey(Press, on_delete=models.RESTRICT, related_name='book')
+    press = models.ForeignKey(Press, on_delete=models.CASCADE, related_name='book')
     pub_data = models.DateField()
     version = models.IntegerField()
     author = models.CharField(max_length=128)
@@ -50,12 +50,13 @@ class Book(models.Model):
     pic = models.CharField(max_length=36, default='default.png')
     permission = models.IntegerField(default=0)
     is_show = models.BooleanField(default=True)
+    is_share = models.BooleanField(default=False)
 
 
 class ShareBook(models.Model):
     vip_id = models.ForeignKey(Vip, on_delete=models.RESTRICT, related_name='share_book')
-    book_id = models.ForeignKey(Book, on_delete=models.RESTRICT, related_name='share_data')
-    data = models.DateTimeField()
+    book_id = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='share_date')
+    date = models.DateTimeField()
 
 
 class Post(models.Model):

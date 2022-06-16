@@ -446,13 +446,8 @@ def vip_review(request):
             'total': user_total,
             'yesterday': user_yesterday,
             'today': user_today,
-            'month': this_month
+            'month': this_month_add
         }
     }
 
     return JsonResponse(response)
-
-
-
-def get_zero_day(daytime:datetime):
-    return daytime.replace(hour=0, minute=0, second=0, microsecond=0)
