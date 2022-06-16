@@ -86,7 +86,7 @@ class FoodInfoView(View):
         post = json.loads(request.body)
 
         try:
-            food_type = FoodType.objects.get(id=post['type'])
+            food_type = FoodType.objects.get(title=post['type'])
         except FoodType.DoesNotExist:
             response = {
                 'code': 404,
@@ -232,19 +232,3 @@ class FoodAvatarView(View):
                 'message': '上传文件为空'
             }
         return JsonResponse(response)
-
-
-def food_buy(request):
-    if request != 'POST':
-        return JsonResponse({'code': 400, 'message': '请求方式错误'})
-    post = json.loads(request.body)
-    food_list = post['foodlist']
-    try:
-        user = Vip.objects.get(id=post['customer_id'])
-    except Vip.DoesNotExist:
-        return JsonResponse({'code': 400, 'message': '用户不存在'})
-    try:
-        seat = Seat.objects.get(id=post['seat_id'])
-    except Seat.DoesNotExist:
-        return JsonResponse({'code': 400, 'message': '座位不存在'})
-    # TODO: 完成订单生成

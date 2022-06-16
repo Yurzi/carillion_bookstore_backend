@@ -141,11 +141,14 @@ class BookInfoView(View):
 
 class PublishInfoView(View):
     def get(self, request):
-        limit = int(request.GET.get('limit'))
-        page = int(request.GET.get('page'))
-        s_name = request.GET.get('s_name')
-        pub_list = Press.objects.all()
-        pub_total = pub_list.count()
+        try:
+            limit = int(request.GET.get('limit'))
+            page = int(request.GET.get('page'))
+            s_name = request.GET.get('s_name')
+            pub_list = Press.objects.all()
+            pub_total = pub_list.count()
+        except Exception as e:
+            return JsonResponse({'code': 500, 'message': str(e)})
 
         try:
             if len(s_name) > 0:
@@ -353,6 +356,7 @@ def get_book_sale_list(request):
             'categoryId': item.type.id,
             'categoryName': item.type.title,
             'name': item.name,
+            'author': item.author,
             'pressId': item.press.id,
             'pressName': item.press.name,
             'price': item.price,
@@ -393,6 +397,8 @@ def put_press_show(request):
         press_obj = Press.objects.get(id=put['id'])
     except Press.DoesNotExist:
         return JsonResponse({'code': 400, 'message': '出版社不存在'})
+    except KeyError as e:
+        return JsonResponse({'code': 400, 'message': str(e)})
     press_obj.is_show = put['show']
     press_obj.save()
     return JsonResponse({'code': 200, 'message': '修改成功'})

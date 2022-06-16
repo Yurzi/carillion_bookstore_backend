@@ -115,8 +115,6 @@ class BookOrder(models.Model):
     pay_price = models.DecimalField(max_digits=65, decimal_places=2, default=0)
     status = models.IntegerField()
     cust_name = models.CharField(max_length=32)
-    address = models.TextField()
-    tel_phone = models.CharField(max_length=32)
     memo = models.TextField()
 
 
@@ -130,7 +128,7 @@ class BookOrderItem(models.Model):
 
 class FoodOrder(models.Model):
     vip_id = models.ForeignKey(Vip, null=True, on_delete=models.SET_NULL, related_name='food_order')
-    seat_id = models.ForeignKey(Seat, null=True, on_delete=models.SET_NULL, related_name='food_order')
+    seat_id = models.ForeignKey(Seat, null=True, default=None, on_delete=models.SET_NULL, related_name='food_order')
     date = models.DateTimeField()
     total_price = models.DecimalField(max_digits=65, decimal_places=2, default=0)
     pay_price = models.DecimalField(max_digits=65, decimal_places=2, default=0)
@@ -151,6 +149,13 @@ class VipOrder(models.Model):
     date = models.DateTimeField()
     total_price = models.DecimalField(max_digits=65, decimal_places=2, default=0)
     pay_price = models.DecimalField(max_digits=65, decimal_places=2, default=0)
+    status = models.IntegerField()
+
+
+class SalaryOrder(models.Model):
+    staff = models.ForeignKey(Staff, null=True, on_delete=models.SET_NULL, related_name='salary_order')
+    amount = models.DecimalField(max_digits=65, decimal_places=2, default=0)
+    date = models.DateTimeField()
     status = models.IntegerField()
 
 

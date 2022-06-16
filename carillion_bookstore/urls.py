@@ -21,6 +21,7 @@ from app_store import book_views
 from app_store import company_views
 from app_store import food_views
 from app_store import share_views
+from app_store import order_views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -64,4 +65,14 @@ urlpatterns = [
     path('v1/food/avatar/', food_views.FoodAvatarView.as_view()),
     path('v1/food/type/', food_views.FoodTypeView.as_view()),
 
+    # order
+    path('v1/order/', order_views.post_sale_order),
+    path('v1/company/deal/',order_views.get_deal_list),
+    path('v1/company/salary/',order_views.post_staff_salary_grant),
+    path('v1/vip/orderlist/', order_views.get_user_deal),
+
+    path('v1/order/vip/', order_views.get_vip_order_by_id),
+    path('v1/order/salary/',order_views.get_salary_order_by_id),
+    path('v1/order/book/',order_views.get_book_order_by_id),
+    path('v1/order/food/',order_views.get_food_order_by_id),
 ]

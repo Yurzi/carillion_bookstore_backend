@@ -168,6 +168,7 @@ def get_book_share_list(request):
             'categoryId': item.type.id,
             'categoryName': item.type.title,
             'name': item.name,
+            'author': item.author,
             'pressId': item.press.id,
             'pressName': item.press.name,
             'price': item.price,
@@ -229,7 +230,7 @@ def post_share_book(request):
     share_book_obj = ShareBook(vip_id= user_obj, book_id=book_obj, date=timezone.now())
     share_book_obj.save()
 
-    return JsonResponse({'code': 200, 'message': '新建成功', 'book_id': book_obj.id, 'share_book_id': share_book_obj})
+    return JsonResponse({'code': 200, 'message': '新建成功', 'book_id': book_obj.id, 'share_book_id': share_book_obj.id})
 
 
 # 获取座位列表
