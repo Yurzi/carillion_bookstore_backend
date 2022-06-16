@@ -364,6 +364,7 @@ def get_book_order_by_id(request):
             'book_id': order_item.book_id.id,
             'book_name': order_item.book_id.name,
             'price': order_item.book_id.price,
+            'amount': order_item.amount,
             'total_price': order_item.total_price,
             'pay_price': order_item.pay_price,
         }
@@ -407,6 +408,7 @@ def get_food_order_by_id(request):
         temp = {
             'food_id': order_item.food_id.id,
             'food_name': order_item.food_id.name,
+            'amount': order_item.amount,
             'price': order_item.food_id.price,
             'total_price': order_item.total_price,
             'pay_price': order_item.pay_price,
