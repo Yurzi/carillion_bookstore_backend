@@ -8,11 +8,14 @@ from app_store.models import *
 class StaffView(View):
     def get(self, request):
         # print(request.GET)
-        limit = int(request.GET.get('limit'))
-        page = int(request.GET.get('page'))
-        s_name = request.GET.get('s_name')
-        s_roleId = int(request.GET.get('s_roleId'))
-        s_departId = int(request.GET.get('s_departId'))
+        try:
+            limit = int(request.GET.get('limit'))
+            page = int(request.GET.get('page'))
+            s_name = request.GET.get('s_name')
+            s_roleId = int(request.GET.get('s_roleId'))
+            s_departId = int(request.GET.get('s_departId'))
+        except Exception as e:
+            return JsonResponse({'code': 400, 'message': str(e)})
 
         staff_list = Staff.objects.all()
         staff_total = staff_list.count()

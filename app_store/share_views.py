@@ -54,7 +54,8 @@ def get_share_seatchange(request):
 
     if seat_obj.condition:
         if seat_obj.vip_id == user_obj:
-            seat_obj.condition = False
+            seat_obj.condition = 0
+            seat_obj.vip_id = None
             seat_obj.save()
             return JsonResponse({'code': 400, 'message': '取消订座'})
         return JsonResponse({'code': 401, 'message': '座位已被占用'})
@@ -251,7 +252,14 @@ def get_seat_list(request):
             'costId': -1
         }
         if bool(item.condition):
-            temp['costId'] = item.vip_id.id
+            try:
+                temp['costId'] = item.vip_id.id
+            except Exception as e:
+                item.condition = 0
+                item.save()
+                temp['condition'] = 0
+                response['error'] = str(e)
+
         response['recordList'].append(temp)
 
     return JsonResponse(response)
