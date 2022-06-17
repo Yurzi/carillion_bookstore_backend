@@ -124,7 +124,7 @@ class FoodInfoView(View):
         except Food.DoesNotExist:
             return JsonResponse({'code': 404, 'message': '食品不存在'})
         try:
-            food_type = FoodType.objects.get(id=post['type'])
+            food_type = FoodType.objects.get(title=post['type'])
         except FoodType.DoesNotExist:
             return JsonResponse({'code': 404, 'message': '类型不存在'})
         try:
