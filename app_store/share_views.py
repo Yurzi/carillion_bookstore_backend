@@ -104,6 +104,10 @@ def get_type_book_list(request):
         temp = {
             'id': book_obj.book_id.id,
             'name': book_obj.book_id.name,
+            'type_id': book_obj.book_id.type.id,
+            'price': book_obj.book_id.price,
+            'press_id': book_obj.book_id.press.id,
+            'pub_date': book_obj.book_id.pub_data,
             'author': book_obj.book_id.author,
             'img': book_obj.book_id.pic,
             'date': book_obj.date,
@@ -285,8 +289,10 @@ def get_type_four_book(request):
             temp = {
                 'book_id': book_item.book_id.id,
                 'book_type': book_item.book_id.type.title,
+                'book_type_id': book_item.book_id.type.id,
                 'book_name': book_item.book_id.name,
                 'book_press': book_item.book_id.press.name,
+                'book_press_id': book_item.book_id.press.id,
                 'book_pubDate': book_item.book_id.pub_data,
                 'book_version': book_item.book_id.version,
                 'book_author': book_item.book_id.author,
